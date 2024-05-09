@@ -1,9 +1,10 @@
+-- adds a new correction for a student
 DELIMITER $$
 
 CREATE PROCEDURE AddBonus (
     IN p_user_id INT,
     IN p_project_name VARCHAR(255),
-    IN p_score DECIMAL(10,2)
+    IN p_score INTEGER
 )
 BEGIN
     DECLARE project_id INT;
