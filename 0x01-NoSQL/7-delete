@@ -1,0 +1,2 @@
+//deletes files for Holberton
+db.school.deleteMany({name: "Holberton school"})
