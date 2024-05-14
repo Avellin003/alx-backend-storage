@@ -1,28 +1,24 @@
 #!/usr/bin/env python3
 """
-Top Students
+best students
 """
 
 
 def top_students(mongo_collection):
-    """ Find top students by average score """
-
-    # Aggregate pipeline to calculate average score
-    pipeline = [
+    """ scholars placed by score """
+    list = [
         {
             "$project":
                 {
-                    "student_name": "$name",
-                    "average_score": {"$avg": "$topics.score"}
+                    "name": "$name",
+                    "averageScore": {"$avg": "$topics.score"}
                 }
         },
         {
             "$sort":
                 {
-                    "average_score": -1
+                    "averageScore": -1
                 }
         }
     ]
-
-    # Perform aggregation using the pipeline
-    return mongo_collection.aggregate(pipeline)
+    return mongo_collection.aggregate(list)
