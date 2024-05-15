@@ -47,7 +47,3 @@ def count_calls(method: Callable) -> Callable:
         self._redis.incr(key)
         return method(self, *args, **kwargs)
     return wrapper
-
-
-# Decorate Cache.store with count_calls
-Cache.store = count_calls(Cache.store)
