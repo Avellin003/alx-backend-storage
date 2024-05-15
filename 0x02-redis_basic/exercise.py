@@ -6,6 +6,18 @@ from typing import Union, Callable
 from functools import wraps
 
 
+def count_calls(method: Callable) -> Callable:
+    """Counts times the cache method is called"""
+    key = method.__qualname__
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """returns the wrapper"""
+        self._redis.incr(key)
+        return method(self, *args, **kwargs)
+    return wrapper
+
+
 class Cache:
     def __init__(self):
         # Initializes redis
@@ -36,8 +48,7 @@ class Cache:
     def get_int(self, key: str) -> int:
         return self.get(key, int)
 
-
-def count_calls(method: Callable) -> Callable:
+    '''def count_calls(method: Callable) -> Callable:
     """Counts times the cache method is called"""
     key = method.__qualname__
 
@@ -46,7 +57,28 @@ def count_calls(method: Callable) -> Callable:
         """returns the wrapper"""
         self._redis.incr(key)
         return method(self, *args, **kwargs)
+    return wrapper'''
+
+
+def call_history(method: Callable) -> Callable:
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        inputs_key = f"{method.__qualname__}:inputs"
+        outputs_key = f"{method.__qualname__}:outputs"
+
+        # Append input arguments to the inputs list
+        self._redis.rpush(inputs_key, str(args))
+
+        # Execute the wrapped function to retrieve the output
+        output = method(self, *args, **kwargs)
+
+        # Store the output in the outputs list
+        self._redis.rpush(outputs_key, str(output))
+
+        return output
     return wrapper
 
-# Decorate Cache.store with count_calls
-Cache.store = count_calls(Cache.store)
+
+# Decorate Cache.store with call_history
+Cache.store = call_history(Cache.store)
