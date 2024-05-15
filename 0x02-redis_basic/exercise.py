@@ -17,3 +17,20 @@ class Cache:
         self._redis.set(key, data)
         # Returns a key
         return key
+
+    def get(self, key: str, fn: Callable = None):
+        value = self._redis.get(key)
+        if value is None:
+            return None
+        if fn:
+            return fn(value)
+        return value
+
+    def decode_utf8(self, value: bytes) -> str:
+        return value.decode('utf-8')
+
+    def get_str(self, key: str) -> str:
+        return self.get(key, self.decode_utf8)
+
+    def get_int(self, key: str) -> int:
+        return self.get(key, int)
